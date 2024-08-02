@@ -68,10 +68,6 @@ fn main() -> ! {
 
     rx.listen(); // Interrupt to receive each byte on line
 
-    // TODO Write/read data (9 bits) to the USART. See:
-    //      https://docs.rs/stm32f4xx-hal/latest/stm32f4xx_hal/serial/index.html)
-    //      https://github.com/stm32-rs/stm32f4xx-hal/blob/master/examples/serial-9bit.rs
-
     let mut loop_counter = 0;
     loop {
         rprintln!("Hello, world! {}", loop_counter);
@@ -108,6 +104,7 @@ fn write_str<USART1: CommonPins>(tx: &mut Tx<pac::USART1>, my_string: &str) {
 
 #[interrupt]
 fn USART1() {
+    static mut RECEIVED_FIRST_COMMAND_BIT: bool = false; // Indicator for startup to discard every byte until the first command-bit is received
     static mut BUFFER: [u8; 256] = [0; 256]; // Internal message buffer
     static mut INDEX: usize = 0; // Internal current message index
 
@@ -118,17 +115,17 @@ fn USART1() {
 
         // Command bit?
         if (two_byte >> 8) > 0 {
-            // TODO what about first message without command bit?
             cortex_m::interrupt::free(|cs| {
                 MESSAGE_BUFFER.borrow(cs).replace(Some(*BUFFER));
                 BUFFER_INDEX.store(*INDEX, Ordering::SeqCst);
                 BUFFER_FILLED.store(true, Ordering::SeqCst);
             });
-
+            
+            *RECEIVED_FIRST_COMMAND_BIT = true;
             *INDEX = 0; // Reset the index for the next message
         }
 
-        if *INDEX < BUFFER.len() {
+        if  *RECEIVED_FIRST_COMMAND_BIT && *INDEX < BUFFER.len() {
             BUFFER[*INDEX] = two_byte as u8; // Cast down that (we don't need the command bit information anymore. The command byte is always at Idx 0)
             *INDEX += 1;
         }
