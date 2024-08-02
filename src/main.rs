@@ -21,7 +21,7 @@ use stm32f4xx_hal::{
     },
 };
 
-use rtt_target::{rprintln, rtt_init_print};
+use rtt_target::{rprintln, rprint, rtt_init_print};
 
 // Stuff for Serial interrupts
 
@@ -82,12 +82,14 @@ fn main() -> ! {
         if BUFFER_FILLED.load(Ordering::SeqCst) {
             cortex_m::interrupt::free(|cs| {
                 if let Some(buffer) = MESSAGE_BUFFER.borrow(cs).borrow_mut().take() {
-                    write_str::<pac::USART1>(&mut tx, "New stuff received:");
+                    rprint!("New stuff received:");
                     let index = BUFFER_INDEX.load(Ordering::SeqCst);
 
                     for val in &buffer[0..index] {
-                        tx.write_char(*val as char);
-                    }
+                        rprint!("{:02X} ", val);
+                        //tx.write_char(*val as char);
+                    }                    
+                    rprint!("\n");
                 }
             });
 
@@ -119,7 +121,7 @@ fn USART1() {
             *INDEX += 1;
         }
 
-        if byte == b'\n' {
+        if  *INDEX >= 5 { //TODO 5 or 4 because of parity? i guess 5
             // TODO if this is for Seatalk, check command byte
             cortex_m::interrupt::free(|cs| {
                 MESSAGE_BUFFER.borrow(cs).replace(Some(*BUFFER));
