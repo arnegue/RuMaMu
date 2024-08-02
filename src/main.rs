@@ -1,0 +1,133 @@
+#![no_main]
+#![no_std]
+
+use core::{
+    cell::RefCell,
+    fmt::Write,
+    sync::atomic::{AtomicBool, AtomicUsize, Ordering},
+};
+
+use cortex_m::interrupt::Mutex;
+use cortex_m_rt::entry;
+
+use panic_halt as _;
+
+use stm32f4xx_hal::{
+    pac::{self, interrupt, USART1},
+    prelude::*,
+    serial::{
+        config::{Config, StopBits},
+        CommonPins, Rx, Serial, Tx,
+    },
+};
+
+use rtt_target::{rprintln, rtt_init_print};
+
+// Stuff for Serial interrupts
+
+static MESSAGE_BUFFER: Mutex<RefCell<Option<[u8; 256]>>> = Mutex::new(RefCell::new(None)); // Shared buffer for messages
+static BUFFER_INDEX: AtomicUsize = AtomicUsize::new(0); // Message length to be shared
+static BUFFER_FILLED: AtomicBool = AtomicBool::new(false); // Notifier that message transmission is complete
+
+#[entry]
+fn main() -> ! {
+    rtt_init_print!();
+
+    // General HAL-Stuff
+    let device = pac::Peripherals::take().unwrap();
+    let rcc = device.RCC.constrain();
+    let clocks = rcc.cfgr.freeze();
+    let _ = device.SYSCFG.constrain();
+    let mut delay = device.TIM2.delay_ms(&clocks);
+    let gpioa = device.GPIOA.split();
+
+    // LED
+    let mut led = gpioa.pa5.into_push_pull_output();
+
+    // Serial
+    let usart1_tx_pin = gpioa.pa9.into_alternate();
+    let usart1_rx_pin = gpioa.pa10.into_pull_down_input();
+
+    let config = Config::default()
+        .baudrate(4800.bps())
+        .wordlength_8()
+        .parity_none()
+        .stopbits(StopBits::STOP1);
+
+    let serial_instance = Serial::<_, u8>::new(
+        device.USART1,
+        (usart1_tx_pin, usart1_rx_pin),
+        config,
+        &clocks,
+    );
+    let (mut tx, mut rx) = serial_instance.unwrap().split();
+
+    unsafe {
+        pac::NVIC::unmask(pac::Interrupt::USART1); // Enable UART-Receive-Interrupts
+    }
+
+    rx.listen(); // Interrupt to receive each byte on line
+
+    // TODO Write/read data (9 bits) to the USART. See:
+    //      https://docs.rs/stm32f4xx-hal/latest/stm32f4xx_hal/serial/index.html)
+    //      https://github.com/stm32-rs/stm32f4xx-hal/blob/master/examples/serial-9bit.rs
+
+    let mut loop_counter = 0;
+    loop {
+        rprintln!("Hello, world! {}", loop_counter);
+        led.toggle();
+        delay.delay_ms(200u32);
+        loop_counter += 1;
+
+        if BUFFER_FILLED.load(Ordering::SeqCst) {
+            cortex_m::interrupt::free(|cs| {
+                if let Some(buffer) = MESSAGE_BUFFER.borrow(cs).borrow_mut().take() {
+                    write_str::<pac::USART1>(&mut tx, "New stuff received:");
+                    let index = BUFFER_INDEX.load(Ordering::SeqCst);
+
+                    for val in &buffer[0..index] {
+                        tx.write_char(*val as char);
+                    }
+                }
+            });
+
+            BUFFER_FILLED.store(false, Ordering::SeqCst);
+        }
+    }
+}
+
+fn write_str<USART1: CommonPins>(tx: &mut Tx<pac::USART1>, my_string: &str) {
+    let error_code = tx.write_str(my_string);
+    match error_code {
+        Ok(_) => rprintln!("Funktioniert!"),
+        Err(x) => rprintln!("Funktioniert nicht {}", x),
+    }
+}
+
+#[interrupt]
+fn USART1() {
+    static mut BUFFER: [u8; 256] = [0; 256]; // Internal message buffer
+    static mut INDEX: usize = 0; // Internal current message index
+
+    let usart1_rb: &pac::usart1::RegisterBlock = unsafe { &*pac::USART1::ptr() };
+
+    if usart1_rb.sr.read().rxne().bit_is_set() {
+        let byte = usart1_rb.dr.read().dr().bits() as u8;
+
+        if *INDEX < BUFFER.len() {
+            BUFFER[*INDEX] = byte;
+            *INDEX += 1;
+        }
+
+        if byte == b'\n' {
+            // TODO if this is for Seatalk, check command byte
+            cortex_m::interrupt::free(|cs| {
+                MESSAGE_BUFFER.borrow(cs).replace(Some(*BUFFER));
+                BUFFER_INDEX.store(*INDEX, Ordering::SeqCst);
+                BUFFER_FILLED.store(true, Ordering::SeqCst);
+            });
+
+            *INDEX = 0; // Reset the index for the next message
+        }
+    }
+}

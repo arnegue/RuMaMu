@@ -1,0 +1,14 @@
+[default.general]
+chip = "STM32F411RETx"
+
+
+[default.rtt]
+enabled = true
+
+[default.gdb]
+enabled = true
+
+[default.probe]
+usb_vid  = "0483"
+usb_pid = "374b"
+# Alternatively use for J-Link: "1366:0101"
