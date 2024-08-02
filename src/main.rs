@@ -21,7 +21,7 @@ use stm32f4xx_hal::{
     },
 };
 
-use rtt_target::{rprintln, rprint, rtt_init_print};
+use rtt_target::{rprint, rprintln, rtt_init_print};
 
 // Stuff for Serial interrupts
 
@@ -50,17 +50,17 @@ fn main() -> ! {
 
     let config = Config::default()
         .baudrate(4800.bps())
-        .wordlength_8()
+        .wordlength_9()
         .parity_none()
         .stopbits(StopBits::STOP1);
 
-    let serial_instance = Serial::<_, u8>::new(
-        device.USART1,
-        (usart1_tx_pin, usart1_rx_pin),
-        config,
-        &clocks,
-    );
-    let (mut tx, mut rx) = serial_instance.unwrap().split();
+    let serial_instance = device
+        .USART1
+        .serial((usart1_tx_pin, usart1_rx_pin), config, &clocks)
+        .unwrap()
+        .with_u16_data(); // Make this Serial object use u16s instead of u8s
+
+    let (mut tx, mut rx) = serial_instance.split();
 
     unsafe {
         pac::NVIC::unmask(pac::Interrupt::USART1); // Enable UART-Receive-Interrupts
@@ -88,7 +88,7 @@ fn main() -> ! {
                     for val in &buffer[0..index] {
                         rprint!("{:02X} ", val);
                         //tx.write_char(*val as char);
-                    }                    
+                    }
                     rprint!("\n");
                 }
             });
@@ -114,15 +114,11 @@ fn USART1() {
     let usart1_rb: &pac::usart1::RegisterBlock = unsafe { &*pac::USART1::ptr() };
 
     if usart1_rb.sr.read().rxne().bit_is_set() {
-        let byte = usart1_rb.dr.read().dr().bits() as u8;
+        let two_byte = usart1_rb.dr.read().dr().bits() as u16;
 
-        if *INDEX < BUFFER.len() {
-            BUFFER[*INDEX] = byte;
-            *INDEX += 1;
-        }
-
-        if  *INDEX >= 5 { //TODO 5 or 4 because of parity? i guess 5
-            // TODO if this is for Seatalk, check command byte
+        // Command bit?
+        if (two_byte >> 8) > 0 {
+            // TODO what about first message without command bit?
             cortex_m::interrupt::free(|cs| {
                 MESSAGE_BUFFER.borrow(cs).replace(Some(*BUFFER));
                 BUFFER_INDEX.store(*INDEX, Ordering::SeqCst);
@@ -130,6 +126,11 @@ fn USART1() {
             });
 
             *INDEX = 0; // Reset the index for the next message
+        }
+
+        if *INDEX < BUFFER.len() {
+            BUFFER[*INDEX] = two_byte as u8; // Cast down that (we don't need the command bit information anymore. The command byte is always at Idx 0)
+            *INDEX += 1;
         }
     }
 }
