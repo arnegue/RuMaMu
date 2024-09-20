@@ -7,11 +7,17 @@ use core::{
     sync::atomic::{AtomicBool, AtomicUsize, Ordering},
 };
 
+mod seatalk_00;
+mod ship_data_traits;
+
+use seatalk_00::Sentence00;
+
 use cortex_m::interrupt::Mutex;
 use cortex_m_rt::entry;
 
 use panic_halt as _;
 
+use ship_data_traits::WaterDepth;
 use stm32f4xx_hal::{
     pac::{self, interrupt, USART1},
     prelude::*,
@@ -67,6 +73,10 @@ fn main() -> ! {
     }
 
     rx.listen(); // Interrupt to receive each byte on line
+
+    let sentence00 = Sentence00;
+    let depth = sentence00.get_depth_cm();
+    rprint!("Depth: {}\n", depth);
 
     let mut loop_counter = 0;
     loop {
