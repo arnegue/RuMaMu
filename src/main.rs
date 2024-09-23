@@ -7,9 +7,11 @@ use core::{
     sync::atomic::{AtomicBool, AtomicUsize, Ordering},
 };
 
+mod seatalk;
 mod seatalk_00;
 mod ship_data_traits;
 
+use seatalk::SeatalkMessage;
 use seatalk_00::Sentence00;
 
 use cortex_m::interrupt::Mutex;
@@ -74,13 +76,18 @@ fn main() -> ! {
 
     rx.listen(); // Interrupt to receive each byte on line
 
-    let sentence00 = Sentence00;
-    let depth = sentence00.get_depth_cm();
-    rprint!("Depth: {}\n", depth);
+    let sentence00 = Sentence00 {
+        depth_cm: 0,
+        anchor_alarm: false,
+        metric_display: true,
+        transducer_defect: false,
+        depth_alarm: false,
+        shallow_alarm: false,
+    };
 
     let mut loop_counter = 0;
     loop {
-        rprintln!("Hello, world! {}", loop_counter);
+        //rprintln!("Hello, world! {}", loop_counter);
         led.toggle();
         delay.delay_ms(200u32);
         loop_counter += 1;
@@ -91,11 +98,14 @@ fn main() -> ! {
                     rprint!("New stuff received:");
                     let index = BUFFER_INDEX.load(Ordering::SeqCst);
 
+                    sentence00.parse_seatalk_data(buffer);
+                    rprint!("Depth: {} Transducer defect: {}\n", sentence00.get_depth_cm(), sentence00.transducer_defect);
+
                     for val in &buffer[0..index] {
                         rprint!("{:02X} ", val);
                         //tx.write_char(*val as char);
                     }
-                    rprint!("\n");
+                    rprint!("\n\n");
                 }
             });
 
@@ -130,12 +140,12 @@ fn USART1() {
                 BUFFER_INDEX.store(*INDEX, Ordering::SeqCst);
                 BUFFER_FILLED.store(true, Ordering::SeqCst);
             });
-            
+
             *RECEIVED_FIRST_COMMAND_BIT = true;
             *INDEX = 0; // Reset the index for the next message
         }
 
-        if  *RECEIVED_FIRST_COMMAND_BIT && *INDEX < BUFFER.len() {
+        if *RECEIVED_FIRST_COMMAND_BIT && *INDEX < BUFFER.len() {
             BUFFER[*INDEX] = two_byte as u8; // Cast down that (we don't need the command bit information anymore. The command byte is always at Idx 0)
             *INDEX += 1;
         }
