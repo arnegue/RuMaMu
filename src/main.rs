@@ -76,15 +76,6 @@ fn main() -> ! {
 
     rx.listen(); // Interrupt to receive each byte on line
 
-    let sentence00 = Sentence00 {
-        depth_cm: 0,
-        anchor_alarm: false,
-        metric_display: true,
-        transducer_defect: false,
-        depth_alarm: false,
-        shallow_alarm: false,
-    };
-
     let mut loop_counter = 0;
     loop {
         //rprintln!("Hello, world! {}", loop_counter);
@@ -96,12 +87,15 @@ fn main() -> ! {
             cortex_m::interrupt::free(|cs| {
                 if let Some(buffer) = MESSAGE_BUFFER.borrow(cs).borrow_mut().take() {
                     rprint!("New stuff received:");
-                    let index = BUFFER_INDEX.load(Ordering::SeqCst);
+                    let message_length = BUFFER_INDEX.load(Ordering::SeqCst);
 
-                    sentence00.parse_seatalk_data(buffer);
-                    rprint!("Depth: {} Transducer defect: {}\n", sentence00.get_depth_cm(), sentence00.transducer_defect);
+                    let parse_result = Sentence00::parse_seatalk_data(buffer, message_length);
+                    match parse_result {
+                        Ok(sentence00) => rprint!("Depth: {} Transducer defect: {}\n", sentence00.get_depth_cm(), sentence00.transducer_defect),
+                        Err(x) => rprintln!("Parsing failed {}", x),
+                    }
 
-                    for val in &buffer[0..index] {
+                    for val in &buffer[0..message_length] {
                         rprint!("{:02X} ", val);
                         //tx.write_char(*val as char);
                     }
