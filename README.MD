@@ -10,11 +10,16 @@ Currently supports:
 See also my python-implementation [NMEA-Seatalk-Multiplexer](https://github.com/arnegue/NMEA-Seatalk-Multiplexer).
 
 # Build
-## Compile for target
-`cargo build --target thumbv7em-none-eabihf`
+## Compile
+Either or:
+* `cargo build --thumbv7em-none-eabihf`
+* `cargo build --target x86_64-pc-windows-msvc`
 
 ## Compile and start on target
 `cargo embed`
+
+# Test
+`cargo test --target x86_64-pc-windows-msvc`
 
 # Prerequisites:
  * cmake
