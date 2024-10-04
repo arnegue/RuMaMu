@@ -1,4 +1,4 @@
-use crate::seatalk::{ParseError, SeatalkMessage};
+use crate::seatalk::seatalk::{ParseError, SeatalkMessage};
 use crate::ship_data_traits::WaterDepth;
 
 pub struct Sentence00 {

@@ -1,21 +1,12 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
-
 #[cfg(test)]
 mod tests {
-    use super::*;
     use rumamu::{
-        seatalk::{ParseError, SeatalkMessage},
-        seatalk_00::Sentence00,
+        seatalk::{
+            seatalk::{ParseError, SeatalkMessage},
+            seatalk_00::Sentence00,
+        },
         ship_data_traits::WaterDepth,
     };
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
 
     #[test]
     fn test_seatalk_parsing() {
