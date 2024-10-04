@@ -14,6 +14,17 @@ pub struct Sentence00 {
     pub shallow_alarm: bool,
 }
 
+/*
+ 00  02  YZ  XX XX  Depth below transducer: XXXX/10 feet
+                       Flags in Y: Y&8 = 8: Anchor Alarm is active
+                                  Y&4 = 4: Metric display units or
+                                           Fathom display units if followed by command 65
+                                  Y&2 = 2: Used, unknown meaning
+                      Flags in Z: Z&4 = 4: Transducer defective
+                                  Z&2 = 2: Deep Alarm is active
+                                  Z&1 = 1: Shallow Depth Alarm is active
+                    Corresponding NMEA sentences: DPT, DBT
+*/
 impl SeatalkMessage for Sentence00 {
     const ID: u8 = 0;
     const LENGTH: usize = 5;
@@ -29,7 +40,7 @@ impl SeatalkMessage for Sentence00 {
         }
 
         let depth_tenth_feet: u16 = ((buffer[4] as u16) << 8_u8) | buffer[3] as u16; // feet*10
-        let depth_cm = (((depth_tenth_feet as u32) * 3048_u32) / 1000_u32) as u16;
+        let depth_cm = (((depth_tenth_feet as u32) * 381_u32) / 125_u32) as u16; // Shortened from 3048/1000
         let anchor_alarm: bool = (buffer[2] & 128) != 0;
         let metric_display: bool = (buffer[2] & 64) != 0;
         let transducer_defect: bool = (buffer[2] & 4) != 0;
@@ -44,6 +55,25 @@ impl SeatalkMessage for Sentence00 {
             depth_alarm,
             shallow_alarm,
         })
+    }
+
+    fn generate_seatalk_data(&self) -> [u8; 256] {
+        let mut return_buffer = [0u8; 256];
+        return_buffer[0] = Self::ID;
+        return_buffer[1] = (Self::LENGTH as u8) - 3_u8; // -3 because the whole message is 5 bytes long, but the "additional" bytes are 3
+
+        let mut flags: u8 = 0;
+        flags |= if self.anchor_alarm { 0x80 } else { 0x00 };
+        flags |= if self.metric_display { 0x40 } else { 0x00 };
+        flags |= if self.transducer_defect { 0x04 } else { 0x00 };
+        flags |= if self.depth_alarm { 0x02 } else { 0x00 };
+        flags |= if self.shallow_alarm { 0x01 } else { 0x00 };
+        return_buffer[2] = flags;
+
+        let depth_tenth_feet: u16 = ((self.depth_cm as u32 * 125_u32) / 381_u32) as u16;
+        return_buffer[3] = (depth_tenth_feet) as u8;
+        return_buffer[4] = (depth_tenth_feet >> 8_u8) as u8;
+        return_buffer
     }
 }
 

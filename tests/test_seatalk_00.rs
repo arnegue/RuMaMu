@@ -13,7 +13,7 @@ mod tests {
         // Test normal parsing
         let expected_result = 2228; // 2228,88 cm
         let mut test_buffer = [0u8; 256];
-        let data = [0x00, 0x02, 0x00, 0xDB, 0x02];
+        let data = [0x00, 0x02, 0x00, 0xDB, 0x02]; // 0x02DB -> 731 -> 73.1 feet -> 2228.08 cm
         test_buffer[..data.len()].copy_from_slice(&data);
 
         let result: Result<Sentence00, ParseError> =
@@ -28,7 +28,21 @@ mod tests {
 
     #[test]
     fn test_seatalk_creation() {
-        //stuff
+        let mut expected_data = [0u8; 256];
+        let data = [0x00, 0x02, 0x00, 0xDA, 0x02]; // DA instead of DB, because of conversion error (we cant fit a float (2208.08 cm) there)
+        expected_data[..data.len()].copy_from_slice(&data);
+
+        let seatalk_sentence = Sentence00 {
+            depth_cm: 2228,
+            anchor_alarm: false,
+            metric_display: false,
+            transducer_defect: false,
+            depth_alarm: false,
+            shallow_alarm: false
+        };
+
+        let actual_data = seatalk_sentence.generate_seatalk_data();        
+        assert_eq!(expected_data, actual_data);
     }
 
     #[test]
