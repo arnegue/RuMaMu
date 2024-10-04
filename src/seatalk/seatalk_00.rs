@@ -1,5 +1,9 @@
 use crate::seatalk::seatalk::{ParseError, SeatalkMessage};
+use crate::seatalk::seatalk_00::Result::Err;
+use crate::seatalk::seatalk_00::Result::Ok;
 use crate::ship_data_traits::WaterDepth;
+use core::marker::Sized;
+use core::result::Result;
 
 pub struct Sentence00 {
     pub depth_cm: u16,
@@ -24,8 +28,8 @@ impl SeatalkMessage for Sentence00 {
             return Err(ParseError::WrongLength);
         }
 
-        let depth_foot: u16 = (((buffer[3] as u16) << 8_u8) | buffer[4] as u16) / 10;
-        let depth_cm = unit_conversions::length::feet::to_centimetres(depth_foot.into());
+        let depth_tenth_feet: u16 = ((buffer[4] as u16) << 8_u8) | buffer[3] as u16; // feet*10
+        let depth_cm = (((depth_tenth_feet as u32) * 3048_u32) / 1000_u32) as u16;
         let anchor_alarm: bool = (buffer[2] & 128) != 0;
         let metric_display: bool = (buffer[2] & 64) != 0;
         let transducer_defect: bool = (buffer[2] & 4) != 0;
@@ -33,7 +37,7 @@ impl SeatalkMessage for Sentence00 {
         let shallow_alarm: bool = (buffer[2] & 1) != 0;
 
         Ok(Sentence00 {
-            depth_cm: depth_cm as u16, // TODO maybe use f64 generally?
+            depth_cm,
             anchor_alarm,
             metric_display,
             transducer_defect,

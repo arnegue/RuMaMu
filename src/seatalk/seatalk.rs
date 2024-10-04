@@ -1,3 +1,6 @@
+use core::marker::Sized;
+use core::result::Result;
+
 pub enum ParseError {
     WrongID,
     WrongLength,

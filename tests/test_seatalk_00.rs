@@ -11,7 +11,7 @@ mod tests {
     #[test]
     fn test_seatalk_parsing() {
         // Test normal parsing
-        let expected_result = 2230;
+        let expected_result = 2228; // 2228,88 cm
         let mut test_buffer = [0u8; 256];
         let data = [0x00, 0x02, 0x00, 0xDB, 0x02];
         test_buffer[..data.len()].copy_from_slice(&data);

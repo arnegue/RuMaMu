@@ -49,6 +49,17 @@
             // Info, Debug
             "consoleLogLevel": "Console",
             "preLaunchTask": "build"
+        },
+        {
+            "name": "Run Test Debugger",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/target/x86_64-pc-windows-msvc/debug/deps/test_seatalk_00-2cfc5a4dc58b23cf.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "preLaunchTask": "cargo test build",
         }
     ]
 }

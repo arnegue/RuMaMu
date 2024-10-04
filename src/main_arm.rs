@@ -8,6 +8,9 @@ use cortex_m::interrupt::Mutex;
 
 use panic_halt as _;
 
+use rumamu::seatalk::{seatalk::SeatalkMessage, seatalk_00::Sentence00};
+use rumamu::ship_data_traits::WaterDepth;
+
 use stm32f4xx_hal::{
     pac::{self, interrupt, USART1},
     prelude::*,
@@ -16,10 +19,6 @@ use stm32f4xx_hal::{
         CommonPins, Rx, Serial, Tx,
     },
 };
-
-use crate::seatalk::SeatalkMessage;
-use crate::seatalk_00::Sentence00;
-use crate::ship_data_traits::WaterDepth;
 
 use rtt_target::{rprint, rprintln, rtt_init_print};
 
@@ -82,8 +81,12 @@ pub fn real_arm_main() -> ! {
 
                     let parse_result = Sentence00::parse_seatalk_data(buffer, message_length);
                     match parse_result {
-                        Ok(sentence00) => rprint!("Depth: {} Transducer defect: {}\n", sentence00.get_depth_cm(), sentence00.transducer_defect),
-                        Err(x) => rprintln!("Parsing failed {}", x),
+                        Ok(sentence00) => rprint!(
+                            "Depth: {} Transducer defect: {}\n",
+                            sentence00.get_depth_cm(),
+                            sentence00.transducer_defect
+                        ),
+                        Err(x) => rprintln!("Parsing failed {}", x as u8),
                     }
 
                     for val in &buffer[0..message_length] {
