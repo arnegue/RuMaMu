@@ -1,4 +1,3 @@
-use core::fmt;
 use crate::seatalk::SeatalkMessage;
 use crate::ship_data_traits::WaterDepth;
 
@@ -21,9 +20,9 @@ impl SeatalkMessage for Sentence00 {
     {
         // TODO format messages and put them into own types
         if buffer[0] != Self::ID {
-            return Err("Wrong sentence ID!");
+            return Err("Wrong sentence ID!");  // TODO specify error
         } else if message_length != Self::LENGTH {
-            return Err("Unexpected message length");
+            return Err("Unexpected message length");  // TODO specify error
         }
 
         let depth_cm: u16 = (((buffer[3] as u16) << 8_u8) | buffer[4] as u16) / 10; // TODO 3 and 4 . why is there no error?

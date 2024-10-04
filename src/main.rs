@@ -8,11 +8,6 @@ mod main_arm;
 #[cfg(target_os = "windows")]
 mod main_win;
 
-// All project related imports
-mod seatalk;
-mod seatalk_00;
-mod ship_data_traits;
-
 #[cfg(target_os = "windows")]
 fn main() {
     main_win::platform_specific_main();
