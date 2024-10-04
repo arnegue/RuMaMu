@@ -1,4 +1,4 @@
-use crate::seatalk::SeatalkMessage;
+use crate::seatalk::{ParseError, SeatalkMessage};
 use crate::ship_data_traits::WaterDepth;
 
 pub struct Sentence00 {
@@ -14,18 +14,17 @@ impl SeatalkMessage for Sentence00 {
     const ID: u8 = 0;
     const LENGTH: usize = 5;
 
-    fn parse_seatalk_data(buffer: [u8; 256], message_length: usize) -> Result<Self, &'static str>
+    fn parse_seatalk_data(buffer: [u8; 256], message_length: usize) -> Result<Self, ParseError>
     where
         Self: Sized,
     {
-        // TODO format messages and put them into own types
         if buffer[0] != Self::ID {
-            return Err("Wrong sentence ID!");  // TODO specify error
+            return Err(ParseError::WrongID);
         } else if message_length != Self::LENGTH {
-            return Err("Unexpected message length");  // TODO specify error
+            return Err(ParseError::WrongLength);
         }
 
-        let depth_cm: u16 = (((buffer[3] as u16) << 8_u8) | buffer[4] as u16) / 10; // TODO 3 and 4 . why is there no error?
+        let depth_cm: u16 = (((buffer[3] as u16) << 8_u8) | buffer[4] as u16) / 10;
         let anchor_alarm: bool = (buffer[2] & 128) != 0;
         let metric_display: bool = (buffer[2] & 64) != 0;
         let transducer_defect: bool = (buffer[2] & 4) != 0;
