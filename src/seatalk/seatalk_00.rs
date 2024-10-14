@@ -1,6 +1,5 @@
 use crate::seatalk::seatalk::{ParseError, SeatalkMessage};
-use crate::seatalk::seatalk_00::Result::Err;
-use crate::seatalk::seatalk_00::Result::Ok;
+use crate::seatalk::seatalk_00::Result::{Err, Ok};
 use crate::ship_data_traits::WaterDepth;
 use core::marker::Sized;
 use core::result::Result;
@@ -25,22 +24,20 @@ pub struct Sentence00 {
                                   Z&1 = 1: Shallow Depth Alarm is active
                     Corresponding NMEA sentences: DPT, DBT
 */
-impl SeatalkMessage for Sentence00 {
+pub const SEATALK_00_SIZE: usize = 5;
+impl SeatalkMessage<SEATALK_00_SIZE> for Sentence00 {
     const ID: u8 = 0;
-    const LENGTH: usize = 5;
 
-    fn parse_seatalk_data(buffer: [u8; 256], message_length: usize) -> Result<Self, ParseError>
+    fn parse_seatalk_data(buffer: [u8; SEATALK_00_SIZE]) -> Result<Self, ParseError>
     where
         Self: Sized,
     {
         if buffer[0] != Self::ID {
             return Err(ParseError::WrongID);
-        } else if message_length != Self::LENGTH {
-            return Err(ParseError::WrongLength);
         }
 
         let depth_tenth_feet: u16 = ((buffer[4] as u16) << 8_u8) | buffer[3] as u16; // feet*10
-        let depth_cm = (((depth_tenth_feet as u32) * 381_u32) / 125_u32) as u16; // Shortened from 3048/1000
+        let depth_cm: u16 = (((depth_tenth_feet as u32) * 381_u32) / 125_u32) as u16; // Shortened from 3048/1000
         let anchor_alarm: bool = (buffer[2] & 128) != 0;
         let metric_display: bool = (buffer[2] & 64) != 0;
         let transducer_defect: bool = (buffer[2] & 4) != 0;
@@ -57,10 +54,10 @@ impl SeatalkMessage for Sentence00 {
         })
     }
 
-    fn generate_seatalk_data(&self) -> [u8; 256] {
-        let mut return_buffer = [0u8; 256];
+    fn generate_seatalk_data(&self) -> [u8; SEATALK_00_SIZE] {
+        let mut return_buffer = [0u8; SEATALK_00_SIZE];
         return_buffer[0] = Self::ID;
-        return_buffer[1] = (Self::LENGTH as u8) - 3_u8; // -3 because the whole message is 5 bytes long, but the "additional" bytes are 3
+        return_buffer[1] = (SEATALK_00_SIZE as u8) - 3_u8; // -3 because the whole message is 5 bytes long, but the "additional" bytes are 3
 
         let mut flags: u8 = 0;
         flags |= if self.anchor_alarm { 0x80 } else { 0x00 };

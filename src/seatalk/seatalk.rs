@@ -6,11 +6,17 @@ pub enum ParseError {
     WrongLength,
 }
 
-pub trait SeatalkMessage {
+pub trait SeatalkMessage<const LENGTH: usize>  {
     const ID: u8; // Seatalk-ID of message (first byte)
-    const LENGTH: usize; // Maximum length overall
-    fn parse_seatalk_data(buffer: [u8; 256], message_length: usize) -> Result<Self, ParseError>
+
+    fn parse_seatalk_data(buffer: [u8; LENGTH]) -> Result<Self, ParseError>
     where
         Self: Sized; // Parses given buffer and sets internal values
-    fn generate_seatalk_data(&self) -> [u8; 256]; // Returns own representation in seatalk bytes
+    fn generate_seatalk_data(&self) -> [u8; LENGTH]; // Returns own representation in seatalk bytes
 }
+
+
+// fn draw<D>(&self, target: &mut D) -> Result<Self::Output, D::Error>
+// where
+//     D: DrawTarget<Color = COL>,
+// {
