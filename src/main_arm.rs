@@ -8,7 +8,7 @@ use cortex_m::interrupt::Mutex;
 
 use panic_halt as _;
 
-use rumamu::seatalk::{seatalk::SeatalkMessage, seatalk_00::Sentence00};
+use rumamu::seatalk::{seatalk::SeatalkMessage, seatalk_00::Sentence00, seatalk::MAX_SEATALK_LENGTH};
 use rumamu::ship_data_traits::WaterDepth;
 
 use stm32f4xx_hal::{
@@ -24,7 +24,7 @@ use rtt_target::{rprint, rprintln, rtt_init_print};
 
 // Stuff for Serial interrupts
 
-static MESSAGE_BUFFER: Mutex<RefCell<Option<[u8; 256]>>> = Mutex::new(RefCell::new(None)); // Shared buffer for messages
+static MESSAGE_BUFFER: Mutex<RefCell<Option<[u8; MAX_SEATALK_LENGTH]>>> = Mutex::new(RefCell::new(None)); // Shared buffer for messages
 static BUFFER_INDEX: AtomicUsize = AtomicUsize::new(0); // Message length to be shared
 static BUFFER_FILLED: AtomicBool = AtomicBool::new(false); // Notifier that message transmission is complete
 
@@ -113,7 +113,7 @@ fn write_str<USART1: CommonPins>(tx: &mut Tx<pac::USART1>, my_string: &str) {
 #[interrupt]
 fn USART1() {
     static mut RECEIVED_FIRST_COMMAND_BIT: bool = false; // Indicator for startup to discard every byte until the first command-bit is received
-    static mut BUFFER: [u8; 256] = [0; 256]; // Internal message buffer
+    static mut BUFFER: [u8; MAX_SEATALK_LENGTH] = [0; MAX_SEATALK_LENGTH]; // Internal message buffer
     static mut INDEX: usize = 0; // Internal current message index
 
     let usart1_rb: &pac::usart1::RegisterBlock = unsafe { &*pac::USART1::ptr() };

@@ -1,6 +1,4 @@
-use crate::seatalk::seatalk::{ParseError, SeatalkMessage};
-use crate::seatalk::seatalk_00::Result::Err;
-use crate::seatalk::seatalk_00::Result::Ok;
+use super::seatalk::{MAX_SEATALK_LENGTH, ParseError, SeatalkMessage};
 use crate::ship_data_traits::WaterDepth;
 use core::marker::Sized;
 use core::result::Result;
@@ -29,7 +27,10 @@ impl SeatalkMessage for Sentence00 {
     const ID: u8 = 0;
     const LENGTH: usize = 5;
 
-    fn parse_seatalk_data(buffer: [u8; 256], message_length: usize) -> Result<Self, ParseError>
+    fn parse_seatalk_data(
+        buffer: [u8; MAX_SEATALK_LENGTH],
+        message_length: usize,
+    ) -> Result<Self, ParseError>
     where
         Self: Sized,
     {
@@ -57,8 +58,8 @@ impl SeatalkMessage for Sentence00 {
         })
     }
 
-    fn generate_seatalk_data(&self) -> [u8; 256] {
-        let mut return_buffer = [0u8; 256];
+    fn generate_seatalk_data(&self) -> [u8; MAX_SEATALK_LENGTH] {
+        let mut return_buffer = [0u8; MAX_SEATALK_LENGTH];
         return_buffer[0] = Self::ID;
         return_buffer[1] = (Self::LENGTH as u8) - 3_u8; // -3 because the whole message is 5 bytes long, but the "additional" bytes are 3
 
