@@ -49,7 +49,7 @@ mod tests {
     fn test_message_length() {
         // Tests parsing a message with a wrong length
         let wrong_length: usize = Sentence00::LENGTH + 1;
-        let test_buffer: [u8; MAX_SEATALK_LENGTH] = [0; MAX_SEATALK_LENGTH];
+        let test_buffer: [u8; MAX_SEATALK_LENGTH] = [Sentence00::ID; MAX_SEATALK_LENGTH];
         let result: Result<Sentence00, ParseError> =
             Sentence00::parse_seatalk_data(test_buffer, wrong_length);
         match result {

@@ -1,4 +1,4 @@
-use super::seatalk::{MAX_SEATALK_LENGTH, ParseError, SeatalkMessage};
+use super::seatalk::{MAX_SEATALK_LENGTH, DATA_BYTES, ParseError, SeatalkMessage};
 use crate::ship_data_traits::WaterDepth;
 use core::marker::Sized;
 use core::result::Result;
@@ -24,7 +24,7 @@ pub struct Sentence00 {
                     Corresponding NMEA sentences: DPT, DBT
 */
 impl SeatalkMessage for Sentence00 {
-    const ID: u8 = 0;
+    const ID: u8 = 0x00;
     const LENGTH: usize = 5;
 
     fn parse_seatalk_data(
@@ -61,7 +61,7 @@ impl SeatalkMessage for Sentence00 {
     fn generate_seatalk_data(&self) -> [u8; MAX_SEATALK_LENGTH] {
         let mut return_buffer = [0u8; MAX_SEATALK_LENGTH];
         return_buffer[0] = Self::ID;
-        return_buffer[1] = (Self::LENGTH as u8) - 3_u8; // -3 because the whole message is 5 bytes long, but the "additional" bytes are 3
+        return_buffer[1] = (Self::LENGTH - DATA_BYTES) as u8;
 
         let mut flags: u8 = 0;
         flags |= if self.anchor_alarm { 0x80 } else { 0x00 };

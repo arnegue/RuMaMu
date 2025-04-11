@@ -1,7 +1,8 @@
 use core::marker::Sized;
 use core::result::Result;
 
-pub const MAX_SEATALK_LENGTH: usize = 25;
+pub const MAX_SEATALK_LENGTH: usize = 25; // Maximum length of a seatalk message
+pub const DATA_BYTES: usize = 3; // "Minimum" length. First byte: ID, Second: Length, 3rd at least one Data-Byte
 
 /// Error types which may occur when parsing received buffer
 pub enum ParseError {
@@ -12,7 +13,7 @@ pub enum ParseError {
 /// Default trait for Seatalk messages
 pub trait SeatalkMessage {
     const ID: u8; // Seatalk-ID of message (first byte)
-    const LENGTH: usize; // Maximum length overall
+    const LENGTH: usize; // Length of whole seatalk message (including ID-byte and so on)
 
     /// Tries to parse the received message and will return an instance of a SeatalkMessage or a ParseError
     fn parse_seatalk_data(
