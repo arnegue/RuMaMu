@@ -2,6 +2,7 @@
     "cSpell.words": [
         "seatalk"
     ],
-    //"rust-analyzer.cargo.target": "thumbv7em-none-eabihf"
+    // "rust-analyzer.cargo.target": "thumbv7em-none-eabihf"
     "rust-analyzer.cargo.target": "x86_64-pc-windows-msvc"
+    //"rust-analyzer.cargo.target": "x86_64-unknown-linux-gnu"
 }

@@ -14,6 +14,7 @@ See also my python-implementation [NMEA-Seatalk-Multiplexer](https://github.com/
 Either or:
 * `cargo build --thumbv7em-none-eabihf`
 * `cargo build --target x86_64-pc-windows-msvc`
+* `cargo build --target x86_64-unknown-linux-gnu`
 
 ## Compile and start on target
 `cargo embed`
@@ -27,7 +28,5 @@ Either or:
 ## Rustup
 ```
 rustup update
-rustup component add llvm-tools-preview
 rustup target add thumbv7em-none-eabihf
-cargo install cargo-binutils probe-rs-tools cargo-expand
 ``` 
