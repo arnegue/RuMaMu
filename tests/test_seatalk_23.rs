@@ -1,21 +1,21 @@
 #[cfg(test)]
-mod tests {
+mod tests_seatalk23 {
     use rumamu::{
         seatalk::{
-            seatalk::{ParseError, SeatalkMessage, MAX_SEATALK_LENGTH}, seatalk_23::Sentence23
+            seatalk::{ParseError, SeatalkMessage, MAX_SEATALK_LENGTH},
+            seatalk_23::Sentence23,
         },
         ship_data_traits::WaterTemperature,
     };
 
-    const TEST_DATA: [u8; 4] = [0x23, 0x41, 0x11, 0]; // 0x3E]; // 0x11 -> 17 -> 17 °C TODO fahrenheit
+    const TEST_DATA: [u8; 4] = [0x23, 0x41, 0x11, 0x3E]; // 0x11 -> 17 -> 17 °C -> 62 °F
 
     #[test]
     fn test_seatalk_parsing() {
-        //  (WaterTemperature1(temperature_c=17.2, sensor_defective=True),                                   bytes()),
         // Test normal parsing
-        let expected_result = 17; // 2228,88 cm
+        let expected_result = 17.0; // 2228,88 cm
         let mut test_buffer = [0u8; MAX_SEATALK_LENGTH];
-        
+
         test_buffer[..TEST_DATA.len()].copy_from_slice(&TEST_DATA);
 
         let result: Result<Sentence23, ParseError> =
@@ -36,11 +36,12 @@ mod tests {
 
         let seatalk_sentence = Sentence23 {
             sensor_defective: true,
-            temperature_c: 11
+            temperature_c: 0x11,
         };
 
         let actual_data = seatalk_sentence.generate_seatalk_data();
-        assert_eq!(expected_data, actual_data);
+
+        assert!(expected_data.iter().eq(actual_data.iter()));
     }
 
     #[test]

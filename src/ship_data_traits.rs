@@ -5,5 +5,5 @@ pub trait WaterDepth {
 
 pub trait WaterTemperature {
     // Returns the temperature in degree celsius
-    fn get_temperature_c(&self) -> u8; // TODO u8? Maybe float/double (better avoid them for non-float uC
+    fn get_temperature_c(&self) -> f64;
 }

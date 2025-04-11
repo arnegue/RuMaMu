@@ -1,5 +1,5 @@
 #[cfg(test)]
-mod tests {
+mod tests_seatalk00 {
     use rumamu::{
         seatalk::{
             seatalk::{ParseError, SeatalkMessage, MAX_SEATALK_LENGTH},
@@ -42,7 +42,7 @@ mod tests {
         };
 
         let actual_data = seatalk_sentence.generate_seatalk_data();
-        assert_eq!(expected_data, actual_data);
+        assert!(expected_data.iter().eq(actual_data.iter()));
     }
 
     #[test]
