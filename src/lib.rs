@@ -3,3 +3,4 @@
 
 pub mod seatalk;
 pub mod ship_data_traits;
+pub mod shipdatabase;
