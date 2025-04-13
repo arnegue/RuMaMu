@@ -17,10 +17,12 @@ pub trait SeatalkMessage {
 
     /// Tries to parse the received message and will return an instance of a SeatalkMessage or a ParseError
     fn parse_seatalk_data(
-        buffer: [u8; MAX_SEATALK_LENGTH],
-        message_length: usize,
+        buffer: [u8; MAX_SEATALK_LENGTH],  // Buffer containing every byte (including ID byte)
+        message_length: usize,             // Length of buffer (may vary)
     ) -> Result<Self, ParseError>
     where
         Self: Sized; // Parses given buffer and sets internal values
-    fn generate_seatalk_data(&self) -> [u8; MAX_SEATALK_LENGTH]; // Returns own representation in seatalk bytes
+
+    // Returns own representation in seatalk bytes
+    fn generate_seatalk_data(&self) -> [u8; MAX_SEATALK_LENGTH];
 }
