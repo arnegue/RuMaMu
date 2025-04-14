@@ -1,4 +1,4 @@
-use super::seatalk::{MAX_SEATALK_LENGTH, DATA_BYTES, ParseError, SeatalkMessage};
+use super::seatalk::{ParseError, SeatalkMessage, DATA_BYTES, MAX_SEATALK_LENGTH};
 use crate::ship_data_traits::WaterDepth;
 use core::marker::Sized;
 use core::result::Result;

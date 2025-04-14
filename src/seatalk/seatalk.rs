@@ -26,3 +26,8 @@ pub trait SeatalkMessage {
     // Returns own representation in seatalk bytes
     fn generate_seatalk_data(&self) -> [u8; MAX_SEATALK_LENGTH];
 }
+
+// TODOs for some re-occurring code:
+//  bytehandling 
+//  ID-Check
+//  Length-Check

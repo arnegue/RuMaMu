@@ -29,7 +29,6 @@ impl SeatalkMessage for Sentence20 {
             return Err(ParseError::WrongLength);
         }
 
-        // TODO make this bytehandling as method?
         let speed_knots: f64 = (((buffer[3] as u16) << 8) | buffer[2] as u16) as f64 / 10.0;
 
         Ok(Sentence20 { speed_knots })
@@ -41,8 +40,7 @@ impl SeatalkMessage for Sentence20 {
         return_buffer[1] = (Self::LENGTH - DATA_BYTES) as u8;
 
         let speed_uint: u16 = (self.speed_knots * 10.0) as u16;
-        
-        // TODO make this bytehandling as method?
+
         return_buffer[2] = (speed_uint & 0xFF) as u8;
         return_buffer[3] = (speed_uint >> 8) as u8;
         return_buffer

@@ -1,8 +1,8 @@
 use super::seatalk::{ParseError, SeatalkMessage, DATA_BYTES, MAX_SEATALK_LENGTH};
-use unit_conversions::temperature;
 use crate::ship_data_traits::WaterTemperature;
 use core::marker::Sized;
 use core::result::Result;
+use unit_conversions::temperature;
 
 pub struct Sentence23 {
     pub sensor_defective: bool,
