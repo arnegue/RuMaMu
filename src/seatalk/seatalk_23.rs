@@ -1,8 +1,8 @@
 use super::seatalk::{ParseError, SeatalkMessage, DATA_BYTES, MAX_SEATALK_LENGTH};
 use crate::ship_data_traits::WaterTemperature;
+use crate::helper::unit_converter::celsius_to_fahrenheit;
 use core::marker::Sized;
 use core::result::Result;
-use unit_conversions::temperature;
 
 pub struct Sentence23 {
     pub sensor_defective: bool,
@@ -48,7 +48,7 @@ impl SeatalkMessage for Sentence23 {
         return_buffer[1] |= if self.sensor_defective { 0x40 } else { 0x00 };
 
         return_buffer[2] = self.water_temperature_c;
-        return_buffer[3] = temperature::celsius::to_fahrenheit(self.water_temperature_c as f64) as u8;  // TODO get rid of library
+        return_buffer[3] = celsius_to_fahrenheit(self.water_temperature_c as f32) as u8; 
         return_buffer
     }
 }
