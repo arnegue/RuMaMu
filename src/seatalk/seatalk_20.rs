@@ -4,7 +4,7 @@ use core::marker::Sized;
 use core::result::Result;
 
 pub struct Sentence20 {
-    pub speed_knots: f64,
+    pub speed_through_water_knots: f64,
     // TODO isnt there some kind of sensor defective too?
 }
 
@@ -29,9 +29,9 @@ impl SeatalkMessage for Sentence20 {
             return Err(ParseError::WrongLength);
         }
 
-        let speed_knots: f64 = (((buffer[3] as u16) << 8) | buffer[2] as u16) as f64 / 10.0;
+        let speed_through_water_knots: f64 = (((buffer[3] as u16) << 8) | buffer[2] as u16) as f64 / 10.0;
 
-        Ok(Sentence20 { speed_knots })
+        Ok(Sentence20 { speed_through_water_knots })
     }
 
     fn generate_seatalk_data(&self) -> [u8; MAX_SEATALK_LENGTH] {
@@ -39,7 +39,7 @@ impl SeatalkMessage for Sentence20 {
         return_buffer[0] = Self::ID;
         return_buffer[1] = (Self::LENGTH - DATA_BYTES) as u8;
 
-        let speed_uint: u16 = (self.speed_knots * 10.0) as u16;
+        let speed_uint: u16 = (self.speed_through_water_knots * 10.0) as u16;
 
         return_buffer[2] = (speed_uint & 0xFF) as u8;
         return_buffer[3] = (speed_uint >> 8) as u8;
@@ -49,6 +49,6 @@ impl SeatalkMessage for Sentence20 {
 
 impl SpeedThroughWater for Sentence20 {
     fn get_speed_through_water_knots(&self) -> f64 {
-        self.speed_knots as f64
+        self.speed_through_water_knots as f64
     }
 }

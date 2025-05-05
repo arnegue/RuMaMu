@@ -36,7 +36,7 @@ mod tests_seatalk23 {
 
         let seatalk_sentence = Sentence23 {
             sensor_defective: true,
-            temperature_c: 0x11,
+            water_temperature_c: 0x11,
         };
 
         let actual_data = seatalk_sentence.generate_seatalk_data();

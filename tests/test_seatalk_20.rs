@@ -35,7 +35,7 @@ mod tests_seatalk20 {
         expected_data[..TEST_DATA.len()].copy_from_slice(&TEST_DATA);
 
         let seatalk_sentence = Sentence20 {
-            speed_knots: 33.9
+            speed_through_water_knots: 33.9
         };
 
         let actual_data = seatalk_sentence.generate_seatalk_data();

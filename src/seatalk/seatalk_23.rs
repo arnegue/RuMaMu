@@ -6,7 +6,7 @@ use unit_conversions::temperature;
 
 pub struct Sentence23 {
     pub sensor_defective: bool,
-    pub temperature_c: u8,
+    pub water_temperature_c: u8,
     // 3rd byte is fahrenheit. Ignore it
 }
 
@@ -32,11 +32,11 @@ impl SeatalkMessage for Sentence23 {
             return Err(ParseError::WrongLength);
         }
 
-        let temperature_c = buffer[2]; // Second byte is Celsius
+        let water_temperature_c = buffer[2]; // Second byte is Celsius
                                        // Ignore 3rd byte (fahrenheit). When generating the temperature gets converted from celsius
         let sensor_defective = buffer[1] & 4 == 4;
         Ok(Sentence23 {
-            temperature_c,
+            water_temperature_c,
             sensor_defective,
         })
     }
@@ -47,14 +47,14 @@ impl SeatalkMessage for Sentence23 {
         return_buffer[1] = (Self::LENGTH - DATA_BYTES) as u8;
         return_buffer[1] |= if self.sensor_defective { 0x40 } else { 0x00 };
 
-        return_buffer[2] = self.temperature_c;
-        return_buffer[3] = temperature::celsius::to_fahrenheit(self.temperature_c as f64) as u8;
+        return_buffer[2] = self.water_temperature_c;
+        return_buffer[3] = temperature::celsius::to_fahrenheit(self.water_temperature_c as f64) as u8;
         return_buffer
     }
 }
 
 impl WaterTemperature for Sentence23 {
     fn get_temperature_c(&self) -> f64 {
-        self.temperature_c as f64
+        self.water_temperature_c as f64
     }
 }

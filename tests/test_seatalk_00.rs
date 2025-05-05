@@ -33,7 +33,7 @@ mod tests_seatalk00 {
         expected_data[..data.len()].copy_from_slice(&data);
 
         let seatalk_sentence = Sentence00 {
-            depth_cm: 2228,
+            depth_below_transducer_cm: 2228,
             anchor_alarm: false,
             metric_display: false,
             transducer_defect: false,

@@ -4,7 +4,7 @@ use core::marker::Sized;
 use core::result::Result;
 
 pub struct Sentence00 {
-    pub depth_cm: u16,
+    pub depth_below_transducer_cm: u16,
     pub anchor_alarm: bool,
     pub metric_display: bool,
     pub transducer_defect: bool,
@@ -41,7 +41,7 @@ impl SeatalkMessage for Sentence00 {
         }
 
         let depth_tenth_feet: u16 = ((buffer[4] as u16) << 8_u8) | buffer[3] as u16; // feet*10
-        let depth_cm = (((depth_tenth_feet as u32) * 381_u32) / 125_u32) as u16; // Shortened from 3048/1000
+        let depth_below_transducer_cm = (((depth_tenth_feet as u32) * 381_u32) / 125_u32) as u16; // Shortened from 3048/1000
         let anchor_alarm: bool = (buffer[2] & 128) != 0;
         let metric_display: bool = (buffer[2] & 64) != 0;
         let transducer_defect: bool = (buffer[2] & 4) != 0;
@@ -49,7 +49,7 @@ impl SeatalkMessage for Sentence00 {
         let shallow_alarm: bool = (buffer[2] & 1) != 0;
 
         Ok(Sentence00 {
-            depth_cm,
+            depth_below_transducer_cm,
             anchor_alarm,
             metric_display,
             transducer_defect,
@@ -71,7 +71,7 @@ impl SeatalkMessage for Sentence00 {
         flags |= if self.shallow_alarm { 0x01 } else { 0x00 };
         return_buffer[2] = flags;
 
-        let depth_tenth_feet: u16 = ((self.depth_cm as u32 * 125_u32) / 381_u32) as u16;
+        let depth_tenth_feet: u16 = ((self.depth_below_transducer_cm as u32 * 125_u32) / 381_u32) as u16;
         return_buffer[3] = (depth_tenth_feet) as u8;
         return_buffer[4] = (depth_tenth_feet >> 8_u8) as u8;
         return_buffer
@@ -80,6 +80,6 @@ impl SeatalkMessage for Sentence00 {
 
 impl WaterDepth for Sentence00 {
     fn get_depth_cm(&self) -> u16 {
-        self.depth_cm
+        self.depth_below_transducer_cm
     }
 }
