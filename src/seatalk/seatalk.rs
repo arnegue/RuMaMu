@@ -6,8 +6,9 @@ pub const DATA_BYTES: usize = 3; // "Minimum" length. First byte: ID, Second: Le
 
 /// Error types which may occur when parsing received buffer
 pub enum ParseError {
-    WrongID,     // Message ID is wrong
-    WrongLength, // Actual received message_length is not expected
+    WrongID,        // Message ID is wrong
+    WrongLength,    // Actual received message_length is not expected
+    UnexpectedData, // The Data in the buffer are not expected (e.g. unknown Enum value)
 }
 
 /// Default trait for Seatalk messages
@@ -17,8 +18,8 @@ pub trait SeatalkMessage {
 
     /// Tries to parse the received message and will return an instance of a SeatalkMessage or a ParseError
     fn parse_seatalk_data(
-        buffer: [u8; MAX_SEATALK_LENGTH],  // Buffer containing every byte (including ID byte)
-        message_length: usize,             // Length of buffer (may vary)
+        buffer: [u8; MAX_SEATALK_LENGTH], // Buffer containing every byte (including ID byte)
+        message_length: usize,            // Length of buffer (may vary)
     ) -> Result<Self, ParseError>
     where
         Self: Sized; // Parses given buffer and sets internal values
@@ -28,6 +29,6 @@ pub trait SeatalkMessage {
 }
 
 // TODOs for some re-occurring code:
-//  bytehandling 
+//  bytehandling
 //  ID-Check
 //  Length-Check
