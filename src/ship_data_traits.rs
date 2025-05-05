@@ -8,10 +8,10 @@ pub trait WaterDepth {
 
 pub trait WaterTemperature {
     // Returns the temperature in degree celsius
-    fn get_temperature_c(&self) -> f64;
+    fn get_temperature_c(&self) -> f32;
 }
 
 pub trait SpeedThroughWater {
     // Returns the speed through_water in knots (TODO better some SI unit)
-    fn get_speed_through_water_knots(&self) -> f64;
+    fn get_speed_through_water_knots(&self) -> f32;
 }
