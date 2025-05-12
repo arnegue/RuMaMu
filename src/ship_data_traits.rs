@@ -12,6 +12,16 @@ pub trait WaterTemperature {
 }
 
 pub trait SpeedThroughWater {
-    // Returns the speed through_water in knots (TODO better some SI unit)
+    // Returns the speed through_water in knots (TODO better use SI unit)
     fn get_speed_through_water_knots(&self) -> f32;
+}
+
+pub trait WindSpeed {
+    // Returns the wind speed in knots  (TODO better use SI unit)
+    fn get_wind_speed_knots(&self) -> f32;
+}
+
+pub trait WindAngle {
+    // Returns the wind angle. Depending on datagram the meaning of it may differ (true or magnetic heading, relative to bow, ...)
+    fn get_wind_angle_degree(&self) -> u16;
 }
