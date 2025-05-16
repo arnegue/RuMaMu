@@ -42,6 +42,22 @@ mod tests_seatalk01 {
     }
 
     #[test]
+    fn test_unexpected_data() {
+        // Tests parsing a message with a wrong data
+        let mut test_buffer: [u8; MAX_SEATALK_LENGTH] = [0; MAX_SEATALK_LENGTH];
+        test_buffer[0] = Sentence01::ID;
+        test_buffer[1] = Sentence01::LENGTH as u8;
+        // Keep the rest 0
+
+        let result: Result<Sentence01, ParseError> =
+        Sentence01::parse_seatalk_data(test_buffer, Sentence01::LENGTH);
+        match result {
+            Err(ParseError::UnexpectedData) => {} // Match the specific error variant
+            _ => panic!("Expected ParseError::UnexpectedData"),
+        }
+    }
+
+    #[test]
     fn test_message_length() {
         // Tests parsing a message with a wrong length
         let wrong_length: usize = Sentence01::LENGTH + 1;
