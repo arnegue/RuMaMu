@@ -9,3 +9,4 @@ pub mod seatalk_26;
 pub mod seatalk_27;
 pub mod seatalk_30;
 pub mod seatalk_31;
+pub mod seatalk_52;
