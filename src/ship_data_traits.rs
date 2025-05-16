@@ -12,8 +12,13 @@ pub trait WaterTemperature {
 }
 
 pub trait SpeedThroughWater {
-    // Returns the speed through_water in knots (TODO better use SI unit)
+    // Returns the speed through water in knots (TODO better use SI unit)
     fn get_speed_through_water_knots(&self) -> f32;
+}
+
+pub trait SpeedOverGround {
+    // Returns the speed over ground in knots (TODO better use SI unit)
+    fn get_speed_over_ground_knots(&self) -> f32;
 }
 
 pub trait WindSpeed {
