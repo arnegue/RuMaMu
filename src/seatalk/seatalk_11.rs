@@ -56,7 +56,7 @@ impl SeatalkMessage for Sentence11 {
 }
 
 impl WindSpeed for Sentence11 {
-    fn get_wind_speed_knots(&self) -> f32 {
-        (self.apparent_wind_speed_deca_knots as f32) / 10.0
+    fn get_wind_speed_knots(&self) -> f64 {
+        (self.apparent_wind_speed_deca_knots as f64) / 10.0
     }
 }

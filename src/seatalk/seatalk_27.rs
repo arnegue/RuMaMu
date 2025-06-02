@@ -4,7 +4,7 @@ use core::marker::Sized;
 use core::result::Result;
 
 pub struct Sentence27 {
-    pub water_temperature_c: f32,  // TODO float maybe?
+    pub water_temperature_c: f64,  // TODO float maybe?
 }
 
 /*
@@ -29,7 +29,7 @@ impl SeatalkMessage for Sentence27 {
         }
 
         let bytes = ((buffer[3] as u16) << 8) | buffer[2] as u16;
-        let water_temperature_c = ((bytes - 100) as f32) / 10.0;
+        let water_temperature_c = ((bytes - 100) as f64) / 10.0;
         Ok(Sentence27 {
             water_temperature_c,
         })
@@ -48,7 +48,7 @@ impl SeatalkMessage for Sentence27 {
 }
 
 impl WaterTemperature for Sentence27 {
-    fn get_temperature_c(&self) -> f32 {
-        self.water_temperature_c as f32
+    fn get_temperature_c(&self) -> f64 {
+        self.water_temperature_c as f64
     }
 }

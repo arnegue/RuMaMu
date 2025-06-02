@@ -9,7 +9,7 @@ mod tests_seatalk11 {
     };
 
     const TEST_DATA: [u8; 4] = [0x11, 0x01, 0xFF, 0x03]; //	0xFF 0x03 -> 0x7F 0x03 -> 127 + (3/10) -> 127.3
-    const EXPECTED_RESULT_KNOTS: f32 = 127.3;
+    const EXPECTED_RESULT_KNOTS: f64 = 127.3;
     const EXPECTED_RESULT_DISPLAY: bool = true;
 
     #[test]

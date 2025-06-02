@@ -4,7 +4,7 @@ use core::marker::Sized;
 use core::result::Result;
 
 pub struct Sentence26 {
-    pub speed_through_water_knots: f32,
+    pub speed_through_water_knots: f64,
     pub speed_valid: bool, // TODO other values? such as average speed and so on
 }
 
@@ -33,7 +33,7 @@ impl SeatalkMessage for Sentence26 {
             return Err(ParseError::WrongLength);
         }
 
-        let speed_through_water_knots: f32 = (((buffer[3] as u16) << 8) | buffer[2] as u16) as f32 / 100.0;
+        let speed_through_water_knots: f64 = (((buffer[3] as u16) << 8) | buffer[2] as u16) as f64 / 100.0;
         let speed_valid: bool = (buffer[6] & 0x40) == 0x40;
         Ok(Sentence26 {
             speed_through_water_knots,
@@ -56,7 +56,7 @@ impl SeatalkMessage for Sentence26 {
 }
 
 impl SpeedThroughWater for Sentence26 {
-    fn get_speed_through_water_knots(&self) -> f32 {
-        self.speed_through_water_knots as f32
+    fn get_speed_through_water_knots(&self) -> f64 {
+        self.speed_through_water_knots as f64
     }
 }

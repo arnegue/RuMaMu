@@ -4,7 +4,7 @@ use core::marker::Sized;
 use core::result::Result;
 
 pub struct Sentence52 {
-    pub speed_over_ground: f32,
+    pub speed_over_ground: f64,
 }
 
 /*
@@ -28,7 +28,7 @@ impl SeatalkMessage for Sentence52 {
             return Err(ParseError::WrongLength);
         }
 
-        let speed_over_ground: f32 = (((buffer[3] as u16) << 8) | buffer[2] as u16) as f32 / 10.0;
+        let speed_over_ground: f64 = (((buffer[3] as u16) << 8) | buffer[2] as u16) as f64 / 10.0;
 
         Ok(Sentence52 { speed_over_ground })
     }
@@ -47,7 +47,7 @@ impl SeatalkMessage for Sentence52 {
 }
 
 impl SpeedOverGround for Sentence52 {
-    fn get_speed_over_ground_knots(&self) -> f32 {
+    fn get_speed_over_ground_knots(&self) -> f64 {
         self.speed_over_ground
     }
 }

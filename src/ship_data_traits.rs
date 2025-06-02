@@ -8,22 +8,22 @@ pub trait WaterDepth {
 
 pub trait WaterTemperature {
     // Returns the temperature in degree celsius
-    fn get_temperature_c(&self) -> f32;
+    fn get_temperature_c(&self) -> f64;
 }
 
 pub trait SpeedThroughWater {
     // Returns the speed through water in knots (TODO better use SI unit)
-    fn get_speed_through_water_knots(&self) -> f32;
+    fn get_speed_through_water_knots(&self) -> f64;
 }
 
 pub trait SpeedOverGround {
     // Returns the speed over ground in knots (TODO better use SI unit)
-    fn get_speed_over_ground_knots(&self) -> f32;
+    fn get_speed_over_ground_knots(&self) -> f64;
 }
 
 pub trait WindSpeed {
     // Returns the wind speed in knots  (TODO better use SI unit)
-    fn get_wind_speed_knots(&self) -> f32;
+    fn get_wind_speed_knots(&self) -> f64;
 }
 
 pub trait WindAngle {

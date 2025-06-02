@@ -9,7 +9,7 @@ mod tests_seatalk52 {
     };
 
     const TEST_DATA: [u8; 4] = [0x52, 0x01, 0xD2, 0x04]; // 0x04D2 -> 1234 -> 123.4 Knots
-    const EXPECTED_RESULT: f32 = 123.4;
+    const EXPECTED_RESULT: f64 = 123.4;
 
     #[test]
     fn test_seatalk_parsing() {

@@ -48,13 +48,13 @@ impl SeatalkMessage for Sentence23 {
         return_buffer[1] |= if self.sensor_defective { 0x40 } else { 0x00 };
 
         return_buffer[2] = self.water_temperature_c;
-        return_buffer[3] = celsius_to_fahrenheit(self.water_temperature_c as f32) as u8; 
+        return_buffer[3] = celsius_to_fahrenheit(self.water_temperature_c as f64) as u8; 
         return_buffer
     }
 }
 
 impl WaterTemperature for Sentence23 {
-    fn get_temperature_c(&self) -> f32 {
-        self.water_temperature_c as f32
+    fn get_temperature_c(&self) -> f64 {
+        self.water_temperature_c as f64
     }
 }
