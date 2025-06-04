@@ -5,7 +5,7 @@ mod tests_seatalk61 {
         seatalk_61::Sentence61,
     };
 
-    const TEST_DATA: [u8; 6] = [0x61, 0x00, 0x03, 0x00, 0x00, 0x00];
+    const TEST_DATA: [u8; 6] = [0x61, 0x03, 0x03, 0x00, 0x00, 0x00];
 
     #[test]
     fn test_seatalk_parsing() {
