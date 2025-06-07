@@ -1,6 +1,8 @@
 // TODO more "generic" types for time, distances, distances/time, temperature and so on
 // E.g. get better get rid of float?
 
+use crate::helper::units::DMM;
+
 pub trait WaterDepth {
     // Returns the water depth (below transducer) in centimeters
     fn get_depth_cm(&self) -> u16;
@@ -39,4 +41,14 @@ pub trait CurrentMileage {
 pub trait TotalMileage {
     // Returns total overall mileage
     fn get_total_mileage(&self) -> u32;
+}
+
+pub trait Longitude {
+    // Returns current longitude
+    fn get_longitude(&self) -> DMM;
+}
+
+pub trait Latitude {
+    // Returns current latitude
+    fn get_latitude(&self) -> DMM;
 }
