@@ -7,7 +7,7 @@ pub struct Date {
     pub day: u8
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Time {
     pub hour: u8,
     pub minute: u8,
