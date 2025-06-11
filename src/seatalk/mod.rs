@@ -12,5 +12,6 @@ pub mod seatalk_36;
 pub mod seatalk_50;
 pub mod seatalk_51;
 pub mod seatalk_52;
+pub mod seatalk_56;
 pub mod seatalk_61;
 pub mod seatalk_80;

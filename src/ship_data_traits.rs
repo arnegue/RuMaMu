@@ -2,6 +2,8 @@
 // E.g. get better get rid of float?
 
 use crate::helper::units::DMM;
+use crate::helper::units::Date as UnitDate;
+use crate::helper::units::Time as UnitTime;
 
 pub trait WaterDepth {
     // Returns the water depth (below transducer) in centimeters
@@ -51,4 +53,14 @@ pub trait Longitude {
 pub trait Latitude {
     // Returns current latitude
     fn get_latitude(&self) -> DMM;
+}
+
+pub trait Date {
+    // Returns current date
+    fn get_date(&self) -> UnitDate;
+}
+
+pub trait Time {
+    // Returns current time
+    fn get_time(&self) -> UnitTime;
 }

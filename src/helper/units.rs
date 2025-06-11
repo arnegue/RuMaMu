@@ -1,5 +1,19 @@
 // Some user defined Units
 
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub struct Date {
+    pub year: u16,
+    pub month: u8,
+    pub day: u8
+}
+
+#[derive(Debug, Copy, Clone)]
+pub struct Time {
+    pub hour: u8,
+    pub minute: u8,
+    pub second: u8
+}
+
 // Degrees, Minutes, Seconds (DMS)
 #[derive(Debug, Copy, Clone)]
 pub struct DMS {
